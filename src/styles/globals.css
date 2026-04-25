@@ -17,11 +17,7 @@ p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
   --fg: #ededed;
   --muted: #8a8a93;
   --border: #1f1f23;
-  --accent: #7ebab5;
-  --accent-strong: #55a8a0;
-  --accent-soft: rgba(126, 186, 181, 0.18);
-  --accent-wash: rgba(126, 186, 181, 0.08);
-  --warn: #f0b35a;
+  --accent: #f97316;
   --card: #111114;
 }
 

@@ -1,104 +1,229 @@
 # thegent-landing
 
-[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
-
-Production landing page at `thegent.kooshapari.com` for [KooshaPari/thegent](https://github.com/KooshaPari/thegent), the Python agent runtime and orchestration system in the Phenotype ecosystem.
+Production landing page at `thegent.kooshapari.com` for [KooshaPari/thegent](https://github.com/KooshaPari/thegent), a Rust-based project management and workflow orchestration platform. Part of the Phenotype org-pages architecture (Tier 2; Tier 1 is `projects.kooshapari.com`).
 
 ## Purpose
 
-`thegent-landing` is the Tier-2 brand surface for theGent. It gives the runtime a stable domain, pulls public project metadata at build time, and exposes path-based microfrontends for landing-site docs, QA, observability, and pull-request previews.
-
-The site is also mirrored to GitHub Pages at `https://kooshapari.github.io/thegent-landing/`; links are generated through `src/lib/site.ts` so the Vercel custom-domain build and Pages base-path build both work.
+Provide a cohesive entry point to Thegent documentation, dashboards, and QA reports. The landing page dynamically pulls project metadata (README, latest release, stats) from the GitHub API at build time, avoiding stale content. Implements the Phenotype org-pages pattern with path-based microfrontends under a single domain.
 
 ## Architecture
 
-- **Frontend:** Astro 6 static site
-- **Styling:** Tailwind CSS 4 with Phenotype CSS tokens
-- **Deployment:** Vercel plus GitHub Pages mirror
+- **Frontend:** Astro 5 (static HTML at build time, edge rendering)
+- **Styling:** Tailwind CSS 4 with impeccable design baseline
+- **Deployment:** Vercel (serverless functions for API routes)
 - **Domain:** `thegent.kooshapari.com` via Cloudflare CNAME
-- **Data sources:** GitHub API, committed QA snapshots, PhenoObservability UI
+- **Data sources:** GitHub API (README, releases), OpenTelemetry backend (metrics), local database (QA reports)
+
+## Stack Details
+
+```toml
+# Runtime
+astro = "5.0"
+tailwindcss = "4.0"
+
+# Build-time
+octokit = "^21.0"  # GitHub API client
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+
+# Optional: async operations
+@vercel/og = "^0.6"  # Open Graph image generation
+```
 
 ## Local Development
 
 ### Prerequisites
 
-- `bun` 1.0+
-- Node.js 20+
-- `git`
+- `bun` 1.0+ (package manager & runtime)
+- Node.js 20+ (fallback)
+- `git` (for GitHub metadata fetching during build)
 
-### Setup
+### Setup & Run
 
 ```bash
+# Clone repository
+git clone https://github.com/KooshaPari/thegent-landing.git
+cd thegent-landing
+
+# Install dependencies
 bun install
-cp .env.example .env
+
+# Set environment variables
+export GITHUB_TOKEN=ghp_xxxx  # Optional: higher API rate limits
+export VERCEL_ENV=development
+
+# Start dev server (with HMR + auto-reload)
 bun run dev
+# Server: http://localhost:3000
 ```
 
-Local dev serves at `http://localhost:4321`.
-
-### Build
+### Build for Production
 
 ```bash
-bunx astro check
+# Build static site
 bun run build
+
+# Preview production build locally
 bun run preview
+
+# Deploy to Vercel
+bun run deploy
 ```
 
 ## Path Microfrontends
 
-Per Phenotype org-pages policy, `thegent.kooshapari.com` hosts these surfaces:
+Per Phenotype org-pages standing policy, `thegent.kooshapari.com` hosts multiple surfaces as path-based microfrontends:
 
-| Path | Status | Purpose |
-|------|--------|---------|
-| `/` | Active | theGent overview, GitHub metadata, runtime proof panel |
-| `/docs` | Active with fallback | Renders this landing repo's `docs/` tree from GitHub |
-| `/otel` | Active, env-gated | Embeds a public PhenoObservability UI |
-| `/qa` | Active with snapshot fallback | Shows landing-site coverage, lint, and FR trace reports |
-| `/preview/<pr#>` | Active with fallback | Canonical static redirect pages for landing PR previews |
+| Path | Component | Status | Purpose |
+|------|-----------|--------|---------|
+| `/` | Landing page | ✅ Active | Thegent overview, GitHub metadata, CTA |
+| `/docs` | VitePress | 📋 Planned | Mounted docs from Thegent/docs @ `/docs` |
+| `/otel` | OTEL Dashboard | 📋 Planned | Observability metrics (latency, throughput, errors) |
+| `/qa` | QA Reports | 📋 Planned | Test coverage, Semgrep results, security scans |
+| `/preview/<pr#>` | PR Preview | 📋 Planned | Deploy PR previews to `/preview/123` on merge to staging |
+
+### Implementing Microfrontends
+
+Each microfrontend is isolated and mounted independently:
+
+```astro
+<!-- src/pages/docs/[...slug].astro — VitePress passthrough -->
+---
+import { getVitePressPage } from '../integrations/vitepresse';
+
+const doc = await getVitePressPage(Astro.params.slug);
+---
+<div set:html={doc.html} />
+```
 
 ## Environment Variables
 
 ```bash
-# GitHub API, optional but recommended for build-time rate limits.
-GITHUB_TOKEN=
+# GitHub API (optional, but recommended)
+GITHUB_TOKEN=ghp_xxxx           # Increases rate limit to 5000 req/hr
 
-# Observability iframe source for /otel.
-PHENO_OTLP_UI_URL=
+# Vercel deployment
+VERCEL_ENV=production|staging    # Set by Vercel automatically
+VERCEL_URL=thegent.kooshapari.com
 
-# Accepted alias for the same public PhenoObservability UI.
-PHENO_OBSERVABILITY_UI_URL=
+# OTEL backend (when microfrontend launches)
+OTEL_ENDPOINT=https://otel.internal/api/v1
+OTEL_AUTH_TOKEN=xxx
 ```
 
-## Editing
+## Building & Customization
 
-- Main landing content: `src/pages/index.astro`
-- Base-path URL helper: `src/lib/site.ts`
-- Docs microfrontend: `src/pages/docs/[...slug].astro`
-- OTel embed: `src/pages/otel/index.astro`
-- QA dashboard: `src/pages/qa/index.astro`
-- PR preview redirects: `src/pages/preview/[prNumber].astro`
-- Shared design tokens: `src/styles/globals.css`
+### Modify Landing Page Content
 
-The shared visual base is GMK Arch teal (`#7ebab5`), aligned with the wider Phenotype landing-page family.
+Edit `src/components/Hero.astro`, `src/components/Features.astro`:
+
+```astro
+---
+// src/components/Hero.astro
+const githubData = await fetchGitHubRepo('KooshaPari/thegent');
+---
+
+<section class="hero">
+  <h1>{githubData.description}</h1>
+  <p>Latest release: {githubData.latestTag}</p>
+</section>
+```
+
+### Add Custom Styling
+
+Extend Tailwind in `tailwind.config.ts`:
+
+```ts
+export default {
+  theme: {
+    extend: {
+      colors: {
+        'phenotype-purple': '#7c3aed',
+      },
+    },
+  },
+}
+```
+
+### Fetch Live Data at Build Time
+
+```astro
+---
+// src/pages/index.astro
+import { getGitHubREADME, getLatestRelease } from '../lib/github';
+
+const readme = await getGitHubREADME('KooshaPari/thegent');
+const release = await getLatestRelease('KooshaPari/thegent');
+---
+
+<article set:html={readme.html} />
+<p>Latest: {release.tag_name}</p>
+```
+
+## Testing & Verification
+
+```bash
+# Lint and format
+bun run lint
+bun run format
+
+# Type check (Astro)
+astro check
+
+# Build and verify no errors
+bun run build
+
+# Test in browser
+bun run preview
+# Visit http://localhost:3000 manually
+```
 
 ## Deployment
 
-Vercel builds the custom-domain site from `main`.
+### Automated (Push to main)
+
+```yaml
+# .github/workflows/deploy.yml triggers on:
+# - Push to main
+# - Manual trigger via workflow_dispatch
+
+# 1. Install dependencies
+# 2. Build static site
+# 3. Deploy to Vercel (automatic with linked repo)
+```
+
+### Manual Deployment
 
 ```bash
+# Deploy to production
 vercel --prod
+
+# Deploy to staging
+vercel --target staging
 ```
 
-Cloudflare DNS should point:
+### Custom Domain (Cloudflare)
 
-```text
-CNAME thegent -> cname.vercel-dns.com
+```bash
+# In Cloudflare DNS:
+CNAME agileplus → cname.vercel-dns.com
+
+# Verify
+nslookup thegent.kooshapari.com
+# Should resolve to Vercel IP
 ```
 
-The GitHub Pages mirror is built by `.github/workflows/pages.yml` with `GITHUB_PAGES=true`, which makes Astro emit URLs under `/thegent-landing/`.
+## Governance
+
+- **Codebase:** TypeScript/Astro (no server-side logic; all static/edge)
+- **Styling:** Tailwind 4 + impeccable CSS baseline
+- **Updates:** Dependabot auto-updates dev dependencies; manual review for breaking changes
+- **Monitoring:** Error tracking via Sentry (optional)
+- **Deployment:** Vercel auto-deploys on push; no manual CI needed
 
 ## Related
 
-- [theGent](https://github.com/KooshaPari/thegent)
-- [projects.kooshapari.com](https://github.com/KooshaPari/portfolio)
-- [Site infrastructure](docs/governance/site-infrastructure.md)
+- [Thegent](https://github.com/KooshaPari/thegent) — Main project repository
+- [projects.kooshapari.com](https://github.com/KooshaPari/portfolio) — Tier 1 landing (all projects)
+- [phenotype-design](../phenotype-design/) — Design system & components
+- [Org Pages Architecture](https://github.com/KooshaPari/phenotype-infrakit/docs/governance/org-pages-architecture.md)
