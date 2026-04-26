@@ -1,14 +1,10 @@
 ---
 import "../../styles/globals.css";
-import { sitePath } from "../../lib/site";
 
 // Tier-3 microfrontend: /docs/* — renders source repo's docs/ tree.
 // Spec: phenotype-infra/docs/governance/path-microfrontends-tier3.md
 
 const REPO = "KooshaPari/thegent-landing";
-const PROJECT_NAME = "theGent";
-const REPO_SLUG = "thegent";
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const { slug } = Astro.params;
 const path = slug ? `docs/${slug}` : "docs";
 
@@ -21,88 +17,73 @@ interface GhContentEntry {
 }
 
 async function ghJson(p: string): Promise<any> {
-  try {
-    const res = await fetch(`https://api.github.com/${p}`, {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "thegent-landing-build",
-        ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
-      },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch (err) {
-    console.warn(`[docs] GitHub ${p} fetch failed: ${(err as Error).message}; using fallback`);
-    return null;
-  }
+  const res = await fetch(`https://api.github.com/${p}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "thegent-landing-build",
+      ...(process.env.GITHUB_TOKEN
+        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+        : {}),
+    },
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 async function ghRaw(p: string): Promise<string | null> {
-  try {
-    const res = await fetch(`https://api.github.com/${p}`, {
-      headers: {
-        Accept: "application/vnd.github.raw",
-        "User-Agent": "thegent-landing-build",
-        ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
-      },
-    });
-    if (!res.ok) return null;
-    return res.text();
-  } catch (err) {
-    console.warn(`[docs] GitHub ${p} fetch failed: ${(err as Error).message}; using fallback`);
-    return null;
-  }
+  const res = await fetch(`https://api.github.com/${p}`, {
+    headers: {
+      Accept: "application/vnd.github.raw",
+      "User-Agent": "thegent-landing-build",
+      ...(process.env.GITHUB_TOKEN
+        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+        : {}),
+    },
+  });
+  if (!res.ok) return null;
+  return res.text();
 }
 
 async function ghHtml(p: string): Promise<string | null> {
-  try {
-    const res = await fetch(`https://api.github.com/${p}`, {
-      headers: {
-        Accept: "application/vnd.github.html+json",
-        "User-Agent": "thegent-landing-build",
-        ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
-      },
-    });
-    if (!res.ok) return null;
-    return res.text();
-  } catch (err) {
-    console.warn(`[docs] GitHub ${p} fetch failed: ${(err as Error).message}; using fallback`);
-    return null;
-  }
+  const res = await fetch(`https://api.github.com/${p}`, {
+    headers: {
+      Accept: "application/vnd.github.html+json",
+      "User-Agent": "thegent-landing-build",
+      ...(process.env.GITHUB_TOKEN
+        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+        : {}),
+    },
+  });
+  if (!res.ok) return null;
+  return res.text();
 }
 
 export async function getStaticPaths() {
   // Recursively walk docs/ via the GitHub Trees API.
   async function walk(): Promise<string[]> {
-    const token = process.env.GITHUB_TOKEN;
-    try {
-      const tree = await fetch(
-        `https://api.github.com/repos/KooshaPari/thegent-landing/git/trees/main?recursive=1`,
-        {
-          headers: {
-            Accept: "application/vnd.github+json",
-            "User-Agent": "thegent-landing-build",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
+    const tree = await fetch(
+      `https://api.github.com/repos/KooshaPari/thegent-landing/git/trees/main?recursive=1`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "thegent-landing-build",
+          ...(process.env.GITHUB_TOKEN
+            ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+            : {}),
         },
-      );
-      if (!tree.ok) return [];
-      const data: any = await tree.json();
-      if (!data.tree) return [];
-      return data.tree
-        .filter(
-          (n: any) =>
-            n.type === "blob" &&
-            n.path.startsWith("docs/") &&
-            (n.path.endsWith(".md") || n.path.endsWith(".mdx")),
-        )
-        .map((n: any) => n.path.replace(/^docs\//, "").replace(/\.mdx?$/, ""));
-    } catch (err) {
-      console.warn(
-        `[docs] GitHub tree fetch failed: ${(err as Error).message}; emitting root docs only`,
-      );
-      return [];
-    }
+      },
+    );
+    if (!tree.ok) return [];
+    const data: any = await tree.json();
+    if (!data.tree) return [];
+    return data.tree
+      .filter(
+        (n: any) =>
+          n.type === "blob" &&
+          n.path.startsWith("docs/") &&
+          (n.path.endsWith(".md") || n.path.endsWith(".mdx")),
+      )
+      .map((n: any) => n.path.replace(/^docs\//, "").replace(/\.mdx?$/, ""));
   }
   const paths = await walk();
   // Always emit a root /docs as well.
@@ -129,8 +110,8 @@ if (Array.isArray(listing)) {
     .map((e) => {
       const href =
         e.type === "dir"
-          ? sitePath(`/docs/${e.path.replace(/^docs\//, "")}`)
-          : sitePath(`/docs/${e.path.replace(/^docs\//, "").replace(/\.mdx?$/, "")}`);
+          ? `/docs/${e.path.replace(/^docs\//, "")}`
+          : `/docs/${e.path.replace(/^docs\//, "").replace(/\.mdx?$/, "")}`;
       return `<li><a class="doc-link" href="${href}">${e.name}</a></li>`;
     })
     .join("\n");
@@ -156,7 +137,7 @@ if (Array.isArray(listing)) {
     const raw = await ghRaw(`repos/${REPO}/contents/${path}.md?ref=main`);
     if (raw) {
       // Last-ditch: raw markdown wrapped in <pre>.
-      bodyHtml = `<pre class="raw-md">${raw.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c] ?? c)}</pre>`;
+      bodyHtml = `<pre class="raw-md">${raw.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "amp;" })[c] ?? c)}</pre>`;
     } else {
       degraded = true;
       degradeReason = `No content found at <code>${path}</code> in <code>${REPO}</code>.`;
@@ -169,15 +150,15 @@ if (Array.isArray(listing)) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} - {PROJECT_NAME} docs</title>
-    <meta name="description" content={`${PROJECT_NAME} landing-site documentation: ${title}`} />
+    <title>{title} · theGent docs</title>
+    <meta name="description" content={`Documentation: ${title}`} />
   </head>
   <body class="min-h-screen">
     <main class="max-w-4xl mx-auto px-6 py-12">
       <nav class="mono text-xs text-[var(--muted)] mb-6">
-        <a href={sitePath("/")} class="hover:text-[var(--accent)]">{REPO_SLUG}</a>
+        <a href="/" class="hover:text-[var(--accent)]">thegent</a>
         <span class="mx-1">/</span>
-        <a href={sitePath("/docs")} class="hover:text-[var(--accent)]">docs</a>
+        <a href="/docs" class="hover:text-[var(--accent)]">docs</a>
         {slug && (
           <>
             <span class="mx-1">/</span>
