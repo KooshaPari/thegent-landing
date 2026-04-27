@@ -1,6 +1,7 @@
 ---
 import "../styles/globals.css";
 import readmeSnapshot from "../data/readme.html?raw";
+import { sitePath } from "../lib/site";
 
 // Fetch repo metadata + README at build time. Strategy: try live GitHub API
 // (uses GITHUB_TOKEN if set in Vercel env to avoid 60/hr unauthenticated rate
@@ -65,7 +66,7 @@ const releases: any[] = (await gh<any[]>(`repos/${REPO}/releases?per_page=5`)) ?
         <div class="mono text-xs text-[var(--muted)] mb-2">
           <a href="https://projects.kooshapari.com" class="hover:text-[var(--accent)]">phenotype</a>
           <span class="mx-1">/</span>
-          <span>agileplus</span>
+          <span>thegent</span>
         </div>
         <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-3">Thegent</h1>
         <p class="text-lg text-[var(--muted)] max-w-2xl">{meta.description}</p>
@@ -75,6 +76,16 @@ const releases: any[] = (await gh<any[]>(`repos/${REPO}/releases?per_page=5`)) ?
              class="px-4 py-2 rounded-lg border bg-[var(--card)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition"
              style="border-color: var(--border);">
             github →
+          </a>
+          <a href={sitePath("/docs")}
+             class="px-4 py-2 rounded-lg border bg-[var(--card)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition"
+             style="border-color: var(--border);">
+            docs →
+          </a>
+          <a href={sitePath("/qa")}
+             class="px-4 py-2 rounded-lg border bg-[var(--card)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition"
+             style="border-color: var(--border);">
+            qa →
           </a>
           {meta.homepage && (
             <a href={meta.homepage} target="_blank" rel="noopener"
@@ -152,6 +163,9 @@ const releases: any[] = (await gh<any[]>(`repos/${REPO}/releases?per_page=5`)) ?
       .readme-prose table { border-collapse: collapse; margin-bottom: 1rem; }
       .readme-prose th, .readme-prose td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; }
       .readme-prose img { display: inline-block; }
+      .readme-prose img[src*="orange"], .readme-prose img[alt="Rust"] {
+        filter: hue-rotate(145deg) saturate(0.8);
+      }
     </style>
   </body>
 </html>
