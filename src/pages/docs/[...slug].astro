@@ -6,6 +6,9 @@ import { sitePath } from "../../lib/site";
 // Spec: phenotype-infra/docs/governance/path-microfrontends-tier3.md
 
 const REPO = "KooshaPari/thegent-landing";
+const PROJECT_NAME = "theGent";
+const REPO_SLUG = "thegent";
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const { slug } = Astro.params;
 const path = slug ? `docs/${slug}` : "docs";
 
@@ -22,9 +25,7 @@ async function ghJson(p: string): Promise<any> {
     headers: {
       Accept: "application/vnd.github+json",
       "User-Agent": "thegent-landing-build",
-      ...(process.env.GITHUB_TOKEN
-        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-        : {}),
+      ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
     },
   });
   if (!res.ok) return null;
@@ -36,9 +37,7 @@ async function ghRaw(p: string): Promise<string | null> {
     headers: {
       Accept: "application/vnd.github.raw",
       "User-Agent": "thegent-landing-build",
-      ...(process.env.GITHUB_TOKEN
-        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-        : {}),
+      ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
     },
   });
   if (!res.ok) return null;
@@ -50,9 +49,7 @@ async function ghHtml(p: string): Promise<string | null> {
     headers: {
       Accept: "application/vnd.github.html+json",
       "User-Agent": "thegent-landing-build",
-      ...(process.env.GITHUB_TOKEN
-        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-        : {}),
+      ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
     },
   });
   if (!res.ok) return null;
@@ -62,15 +59,14 @@ async function ghHtml(p: string): Promise<string | null> {
 export async function getStaticPaths() {
   // Recursively walk docs/ via the GitHub Trees API.
   async function walk(): Promise<string[]> {
+    const token = process.env.GITHUB_TOKEN;
     const tree = await fetch(
       `https://api.github.com/repos/KooshaPari/thegent-landing/git/trees/main?recursive=1`,
       {
         headers: {
           Accept: "application/vnd.github+json",
           "User-Agent": "thegent-landing-build",
-          ...(process.env.GITHUB_TOKEN
-            ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-            : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       },
     );
@@ -138,7 +134,7 @@ if (Array.isArray(listing)) {
     const raw = await ghRaw(`repos/${REPO}/contents/${path}.md?ref=main`);
     if (raw) {
       // Last-ditch: raw markdown wrapped in <pre>.
-      bodyHtml = `<pre class="raw-md">${raw.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "amp;" })[c] ?? c)}</pre>`;
+      bodyHtml = `<pre class="raw-md">${raw.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c] ?? c)}</pre>`;
     } else {
       degraded = true;
       degradeReason = `No content found at <code>${path}</code> in <code>${REPO}</code>.`;
@@ -151,13 +147,13 @@ if (Array.isArray(listing)) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} · theGent docs</title>
-    <meta name="description" content={`Documentation: ${title}`} />
+    <title>{title} - {PROJECT_NAME} docs</title>
+    <meta name="description" content={`${PROJECT_NAME} landing-site documentation: ${title}`} />
   </head>
   <body class="min-h-screen">
     <main class="max-w-4xl mx-auto px-6 py-12">
       <nav class="mono text-xs text-[var(--muted)] mb-6">
-        <a href={sitePath("/")} class="hover:text-[var(--accent)]">thegent</a>
+        <a href={sitePath("/")} class="hover:text-[var(--accent)]">{REPO_SLUG}</a>
         <span class="mx-1">/</span>
         <a href={sitePath("/docs")} class="hover:text-[var(--accent)]">docs</a>
         {slug && (
