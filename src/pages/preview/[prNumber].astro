@@ -19,6 +19,8 @@ import { sitePath } from "../../lib/site";
 const REPO_OWNER = "KooshaPari";
 const REPO_NAME = "thegent-landing";
 const REPO = `${REPO_OWNER}/${REPO_NAME}`;
+const PROJECT_NAME = "theGent";
+const REPO_SLUG = "thegent";
 interface PrInfo {
   number: number;
   title: string;
@@ -142,14 +144,14 @@ const prUrlOnGitHub = `https://github.com/${REPO}/pull/${prNumber}`;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{pr ? `Preview · PR #${pr.number} · theGent` : `Preview · PR #${prNumber} · theGent`}</title>
-    <meta name="description" content="Stable canonical URL for theGent PR preview deploys." />
+    <title>{pr ? `Preview - PR #${pr.number} - ${PROJECT_NAME}` : `Preview - PR #${prNumber} - ${PROJECT_NAME}`}</title>
+    <meta name="description" content={`Stable canonical URL for ${PROJECT_NAME} landing PR preview deploys.`} />
     {pr && <meta http-equiv="refresh" content={`2; url=${pr.previewUrl}`} />}
   </head>
   <body class="min-h-screen">
     <main class="max-w-3xl mx-auto px-6 py-12">
       <nav class="mono text-xs text-[var(--muted)] mb-6">
-        <a href={sitePath("/")} class="hover:text-[var(--accent)]">thegent</a>
+        <a href={sitePath("/")} class="hover:text-[var(--accent)]">{REPO_SLUG}</a>
         <span class="mx-1">/</span>
         <span>preview</span>
         <span class="mx-1">/</span>
@@ -215,7 +217,7 @@ const prUrlOnGitHub = `https://github.com/${REPO}/pull/${prNumber}`;
             </p>
             <p class="mt-2">
               <a href={`https://github.com/${REPO}/pulls`} class="preview-link-secondary">
-                See all open theGent PRs →
+                See all open {PROJECT_NAME} landing PRs ->
               </a>
             </p>
           </div>
