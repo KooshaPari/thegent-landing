@@ -14,6 +14,9 @@ import { sitePath } from "../../lib/site";
 // Each panel degrades gracefully and loudly when its source is absent.
 
 const REPO = "KooshaPari/thegent-landing";
+const PROJECT_NAME = "theGent";
+const REPO_SLUG = "thegent";
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 interface CoverageReport {
   pct?: number;
@@ -53,9 +56,7 @@ async function ghReport<T>(file: string, snapshotKey: string): Promise<PanelResu
         headers: {
           Accept: "application/vnd.github.raw",
           "User-Agent": "thegent-landing-build",
-          ...(process.env.GITHUB_TOKEN
-            ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-            : {}),
+          ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
         },
       },
     );
@@ -109,13 +110,13 @@ function pctClass(pct: number | undefined): string {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>QA · theGent</title>
-    <meta name="description" content="Quality dashboard: coverage, lint status, FR traceability." />
+    <title>QA - {PROJECT_NAME}</title>
+    <meta name="description" content={`${PROJECT_NAME} landing-site quality dashboard: coverage, lint status, FR traceability.`} />
   </head>
   <body class="min-h-screen">
     <main class="max-w-5xl mx-auto px-6 py-12">
       <nav class="mono text-xs text-[var(--muted)] mb-6">
-        <a href={sitePath("/")} class="hover:text-[var(--accent)]">thegent</a>
+        <a href={sitePath("/")} class="hover:text-[var(--accent)]">{REPO_SLUG}</a>
         <span class="mx-1">/</span>
         <span>qa</span>
       </nav>
