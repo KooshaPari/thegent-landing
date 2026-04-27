@@ -8,9 +8,9 @@ Provide a cohesive entry point to Thegent documentation, dashboards, and QA repo
 
 ## Architecture
 
-- **Frontend:** Astro 5 (static HTML at build time, edge rendering)
+- **Frontend:** Astro 6 (static HTML at build time, edge rendering)
 - **Styling:** Tailwind CSS 4 with impeccable design baseline
-- **Deployment:** Vercel (serverless functions for API routes)
+- **Deployment:** Vercel plus a GitHub Pages mirror
 - **Domain:** `thegent.kooshapari.com` via Cloudflare CNAME
 - **Data sources:** GitHub API (README, releases), OpenTelemetry backend (metrics), local database (QA reports)
 
@@ -18,7 +18,7 @@ Provide a cohesive entry point to Thegent documentation, dashboards, and QA repo
 
 ```toml
 # Runtime
-astro = "5.0"
+astro = "6.0"
 tailwindcss = "4.0"
 
 # Build-time
