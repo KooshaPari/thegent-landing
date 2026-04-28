@@ -2,12 +2,12 @@ version: "3"
 
 tasks:
   default:
-    desc: Build the Astro site
+    desc: Build the Bun/Astro site
     cmds:
       - task: build
 
   build:
-    desc: Build the Astro site
+    desc: Build the Bun/Astro site
     cmds:
       - bun run build
 
@@ -18,7 +18,7 @@ tasks:
       - bun run build
 
   lint:
-    desc: Run Astro diagnostics and type checks
+    desc: Run Astro diagnostics and TypeScript checks
     cmds:
       - bunx astro check
 
