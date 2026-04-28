@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  build:
+    desc: Build the Astro site
+    cmds:
+      - bun run build
+
+  test:
+    desc: Run the site validation build
+    cmds:
+      - bun run build
+
+  lint:
+    desc: Run Astro diagnostics and type checks
+    cmds:
+      - bunx astro check
+
+  clean:
+    desc: Remove generated build artifacts
+    cmds:
+      - rm -rf dist .astro
