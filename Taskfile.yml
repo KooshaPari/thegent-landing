@@ -15,7 +15,7 @@ tasks:
     desc: Run site validation checks
     cmds:
       - task: lint
-      - bun run build
+      - task: build
 
   lint:
     desc: Run Astro diagnostics and TypeScript checks
