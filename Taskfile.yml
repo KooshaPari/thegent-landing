@@ -1,6 +1,11 @@
 version: "3"
 
 tasks:
+  default:
+    desc: Build the Astro site
+    cmds:
+      - task: build
+
   build:
     desc: Build the Astro site
     cmds:
@@ -19,4 +24,4 @@ tasks:
   clean:
     desc: Remove generated build artifacts
     cmds:
-      - rm -rf dist .astro
+      - git clean -fdX -- dist .astro
