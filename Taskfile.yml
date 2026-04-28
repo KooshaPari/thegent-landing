@@ -15,6 +15,9 @@ tasks:
   build:
     desc: Build the Bun/Astro site
     summary: Uses the detected Bun package manager and Astro build script.
+    preconditions:
+      - sh: command -v {{.RUNTIME}}
+        msg: "{{.RUNTIME}} is required to build this Astro site."
     cmds:
       - "{{.BUILD_CMD}}"
 
@@ -27,6 +30,9 @@ tasks:
   lint:
     desc: Run Astro diagnostics and TypeScript checks
     summary: The repo does not define a dedicated lint script, so Astro check is the canonical validation command.
+    preconditions:
+      - sh: command -v {{.RUNTIME}}x
+        msg: "{{.RUNTIME}}x is required to run Astro diagnostics."
     cmds:
       - "{{.LINT_CMD}}"
 
