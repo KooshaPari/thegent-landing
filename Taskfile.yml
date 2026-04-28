@@ -12,9 +12,9 @@ tasks:
       - bun run build
 
   test:
-    desc: Run a clean site validation build
+    desc: Run site validation checks
     cmds:
-      - task: clean
+      - task: lint
       - bun run build
 
   lint:
