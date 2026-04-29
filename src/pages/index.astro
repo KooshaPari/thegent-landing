@@ -21,6 +21,11 @@ const RUNTIME_SURFACES = [
   ["Orchestration", "Task execution, routing, and runtime coordination"],
   ["Governance", "QA, docs, and preview surfaces for release discipline"],
 ] as const;
+const CURRENT_STATE = [
+  ["Runtime shape", "Python agent runtime with provider, tool, and orchestration surfaces."],
+  ["Landing routes", "Static docs, QA, OTel, and PR preview routes build from this site."],
+  ["Operator path", "Start in docs for contracts, then use QA to confirm release posture."],
+] as const;
 
 async function gh<T = unknown>(
   path: string,
@@ -129,6 +134,24 @@ const releases: any[] = (await gh<any[]>(`repos/${REPO}/releases?per_page=5`)) ?
         </div>
       </header>
 
+      <section class="current-state mb-10" aria-label="theGent current state">
+        <div>
+          <h2>Current state</h2>
+          <p>
+            theGent is presented here as an operational agent-runtime surface:
+            runtime contracts first, then quality evidence, then previewable change lanes.
+          </p>
+        </div>
+        <dl>
+          {CURRENT_STATE.map(([label, value]) => (
+            <div>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       {releases.length > 0 && (
         <section class="mb-10">
           <h2 class="mono text-sm uppercase tracking-wider text-[var(--muted)] mb-3">Latest releases</h2>
@@ -203,6 +226,44 @@ const releases: any[] = (await gh<any[]>(`repos/${REPO}/releases?per_page=5`)) ?
         font-size: 0.84rem;
         line-height: 1.45;
       }
+      .current-state {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 0.7rem;
+        background: color-mix(in oklab, var(--card) 88%, #d7f2ef 12%);
+        padding: 1rem;
+      }
+      .current-state h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+      }
+      .current-state p,
+      .current-state dd {
+        color: var(--muted);
+      }
+      .current-state p {
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+      .current-state dl {
+        display: grid;
+        gap: 0.7rem;
+      }
+      .current-state div {
+        min-width: 0;
+      }
+      .current-state dt {
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 0.18rem;
+      }
+      .current-state dd {
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
       .readme-prose { line-height: 1.7; }
       .readme-prose h1, .readme-prose h2, .readme-prose h3 {
         font-weight: 700;
@@ -247,7 +308,8 @@ const releases: any[] = (await gh<any[]>(`repos/${REPO}/releases?per_page=5`)) ?
       }
       @media (max-width: 760px) {
         .hero-shell,
-        .runtime-grid {
+        .runtime-grid,
+        .current-state {
           grid-template-columns: 1fr;
         }
       }
