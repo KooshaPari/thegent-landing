@@ -1,5 +1,7 @@
 # thegent-landing
 
+[![AI Slop Inside](https://sladge.net/badge.svg)](https://sladge.net)
+
 Production landing page at `thegent.kooshapari.com` for [KooshaPari/thegent](https://github.com/KooshaPari/thegent), the Python agent runtime and orchestration system in the Phenotype ecosystem.
 
 ## Purpose
