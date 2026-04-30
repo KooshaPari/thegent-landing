@@ -47,11 +47,16 @@ export async function getStaticPaths() {
   });
 
   const ghJson = async (path: string): Promise<any> => {
-    const res = await fetch(`https://api.github.com/${path}`, {
-      headers: ghHeaders(),
-    });
-    if (!res.ok) return null;
-    return res.json();
+    try {
+      const res = await fetch(`https://api.github.com/${path}`, {
+        headers: ghHeaders(),
+      });
+      if (!res.ok) return null;
+      return res.json();
+    } catch (err) {
+      console.warn(`[preview] GitHub ${path} fetch failed: ${(err as Error).message}; using fallback`);
+      return null;
+    }
   };
 
   const sanitizeBranch = (b: string) =>
@@ -72,7 +77,9 @@ export async function getStaticPaths() {
         const summary: string = run?.output?.summary ?? "";
         const urlMatch = summary.match(/https:\/\/[a-z0-9-]+\.vercel\.app/i);
         if (urlMatch) return { url: urlMatch[0], source: "vercel-check-run" };
-        if (run?.details_url) return { url: run.details_url, source: "vercel-check-run" };
+        if (run?.details_url && /^https:\/\/[a-z0-9-]+\.vercel\.app/i.test(run.details_url)) {
+          return { url: run.details_url, source: "vercel-check-run" };
+        }
       }
     }
     const deployments = await ghJson(`repos/${REPO_INNER}/deployments?sha=${sha}&per_page=20`);
