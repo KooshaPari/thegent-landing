@@ -2,7 +2,10 @@
  * Site path utilities for thegent-landing
  */
 
-import { SITE_CONFIG } from './constants';
+import { BASE_PATH, SITE_CONFIG } from './constants';
+
+// Re-export BASE_PATH for convenience
+export { BASE_PATH } from './constants';
 
 /**
  * Constructs an absolute site path by prepending the base URL path.
