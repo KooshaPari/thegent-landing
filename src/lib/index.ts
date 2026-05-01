@@ -5,7 +5,9 @@
  */
 
 // Re-export all public functions and constants
-export { BASE_PATH, sitePath } from './site';
+export { BASE_PATH, SITE_CONFIG } from './constants';
+export { BASE_PATH, createSitePath, sitePath, type SitePathFunction } from './site';
+export type { SiteConfig } from './constants';
 
 /**
  * Get the full path for a given route
