@@ -1,17 +1,24 @@
-/**
- * TheGent Landing Site Utilities
- * 
- * Path utilities for Astro site generation
- */
+// Barrel export for thegent-landing lib
 
-// Re-export all public functions and constants
-export { BASE_PATH, sitePath } from './site';
+// Constants
+export { SITE_CONFIG } from './constants';
+export type { SiteConfig } from './constants';
 
-/**
- * Get the full path for a given route
- * @param route - The route path (e.g., '/about', '/pricing')
- * @returns Full absolute path
- */
-export function getFullPath(route: string): string {
-  return `${BASE_PATH}${route}`;
-}
+// Site utilities
+export { sitePath } from './site';
+export type { SitePathFunction } from './site';
+
+// GitHub API utilities
+export { gh, fetchRepoMeta, fetchReleases, ghJson, ghRaw, ghHtml } from './github';
+
+// Types
+export type {
+  CoverageReport,
+  LintReport,
+  FrTraceReport,
+  GhContentEntry,
+  GhRepoMeta,
+  GhRelease,
+  PrInfo,
+  PanelResult,
+} from './types';

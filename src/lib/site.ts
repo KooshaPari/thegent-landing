@@ -1,32 +1,15 @@
 /**
- * Site path utilities for thegent-landing
- */
-
-import { BASE_PATH, SITE_CONFIG } from './constants';
-
-// Re-export BASE_PATH for convenience
-export { BASE_PATH } from './constants';
-
-/**
- * Constructs an absolute site path by prepending the base URL path.
- * @param path - The relative path to append
- * @returns The absolute path with base URL prefix
- */
-export function sitePath(path: string): string {
-	const normalized = path.startsWith('/') ? path : `/${path}`;
-	return `${SITE_CONFIG.baseUrl}${normalized}` || '/';
-}
-
-export type SitePathFunction = typeof sitePath;
-
-/**
- * Creates a site path function configured with site-specific settings.
- * The returned function constructs absolute paths by prepending the base path.
+ * Site path utilities adapter for thegent-landing
  *
- * @returns A function that takes a relative path and returns an absolute site path
- *
- * @example
- * const getPath = createSitePath();
- * getPath('/docs'); // Returns '/thegent/docs'
+ * Imports from shared @kilocode/landing-utils and creates a bound sitePath
+ * function using this site's configuration.
  */
-export const createSitePath = () => (path: string): string => sitePath(path);
+
+import { createSitePath, type SitePathFunction } from '@kilocode/landing-utils';
+import { SITE_CONFIG } from './constants';
+
+/** Bound sitePath function for thegent-landing */
+export const sitePath = createSitePath(SITE_CONFIG);
+
+/** Type for the sitePath function */
+export type { SitePathFunction };
